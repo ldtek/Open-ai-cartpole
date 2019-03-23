@@ -1,29 +1,27 @@
+import numpy as np
+import matplotlib.pyplot as plt
 import gym
-import random
 
-env_name = "CartPole-v1"
-env = gym.make(env_name)
-print("Observation space:", env.observation_space)
-print("Action space:", env.action_space)
+def SimplePolicy(state):
+    action = 0 if state < 0 else 1
+    return action
 
+if __name__ == '__main__':
+    env = gym.make('CartPole-v0')
 
-class Agent():
-    def __init__(self, env):
-        self.action_size = env.action_space.n
-        print("Action size:", self.action_size)
+    totalRewards = []
+    for i in range(1000):
+        # cart x position, cart velocity, pole theta, pole velocity
+        observation = env.reset()
+        done = False
+        epRewards = 0
+        while not done:
+            a = SimplePolicy(observation[2])
+            observation_, reward, done, info = env.step(a)
+            epRewards += reward
+            observation = observation_
+            env.render()
+        totalRewards.append(epRewards)
 
-    def get_action(self, state):
-#         action = random.choice(range(self.action_size))
-        pole_angle = state[2]
-        action = 0 if pole_angle < 0 else 1
-        return action
-
-
-agent = Agent(env)
-state = env.reset()
-
-for _ in range(200):
-#     action = env.action_space.sample()
-    action = agent.get_action(state)
-    state, reward, done, info = env.step(action)
-    env.render()
+    plt.plot(totalRewards)
+    plt.show()
